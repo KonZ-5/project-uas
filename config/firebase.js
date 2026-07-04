@@ -1,30 +1,26 @@
-require('dotenv').config(); 
+require('dotenv').config();
 const admin = require('firebase-admin');
 
 let db = null;
-const firebaseConfig = process.env.firebase_service_account;
 
-if (!firebaseConfig) {
-  console.error("⚠️ Peringatan: Variabel 'firebase_service_account' belum diatur!");
+const base64Credentials = process.env.FIREBASE_BASE64;
+
+if (!base64Credentials) {
+  console.error("⚠️ Peringatan: Variabel 'FIREBASE_BASE64' belum diatur di .env!");
 } else {
   try {
-    const serviceAccount = JSON.parse(firebaseConfig);
-
-    // BARIS INI SANGAT PENTING: Mengubah teks \\n menjadi baris baru yang nyata
-    const formattedPrivateKey = serviceAccount.private_key.replace(/\\n/g, '\n');
+    // Men-decode string Base64 kembali menjadi teks JSON asli
+    const decodedJson = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+    const serviceAccount = JSON.parse(decodedJson);
 
     admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: serviceAccount.project_id,
-        clientEmail: serviceAccount.client_email,
-        privateKey: formattedPrivateKey // Menggunakan kunci yang sudah diperbaiki
-      })
+      credential: admin.credential.cert(serviceAccount)
     });
 
     db = admin.firestore();
-    console.log("✅ Firebase Admin berhasil terhubung.");
+    console.log("✅ Firebase Admin berhasil terhubung menggunakan Base64 Auth!");
   } catch (error) {
-    console.error("❌ Gagal membaca konfigurasi JSON Firebase:", error.message);
+    console.error("❌ Gagal membaca atau mendecode konfigurasi Firebase:", error.message);
   }
 }
 

@@ -3,25 +3,26 @@ const admin = require('firebase-admin');
 
 let db = null;
 
-const base64Credentials = process.env.FIREBASE_BASE64;
+try {
+  let serviceAccount;
 
-if (!base64Credentials) {
-  console.error("⚠️ Peringatan: Variabel 'FIREBASE_BASE64' belum diatur di .env!");
-} else {
-  try {
-    // Men-decode string Base64 kembali menjadi teks JSON asli
-    const decodedJson = Buffer.from(base64Credentials, 'base64').toString('utf-8');
-    const serviceAccount = JSON.parse(decodedJson);
-
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
-    });
-
-    db = admin.firestore();
-    console.log("✅ Firebase Admin berhasil terhubung menggunakan Base64 Auth!");
-  } catch (error) {
-    console.error("❌ Gagal membaca atau mendecode konfigurasi Firebase:", error.message);
+  // Cek apakah ada variabel di .env
+  if (process.env.firebase_service_account) {
+    serviceAccount = JSON.parse(process.env.firebase_service_account);
+  } else {
+    // Jika tidak ada di .env, coba baca langsung dari file lokal (pastikan file ini ada di folder proyek Anda)
+    // PENTING: Pastikan 'serviceAccountKey.json' sudah masuk ke .gitignore Anda!
+    serviceAccount = require('../serviceAccountKey.json'); 
   }
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+
+  db = admin.firestore();
+  console.log("✅ Firebase Admin berhasil terhubung ke Firestore.");
+} catch (error) {
+  console.error("❌ Firebase gagal terinisialisasi:", error.message);
 }
 
 module.exports = db;

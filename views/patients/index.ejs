@@ -1,0 +1,95 @@
+<!-- views/patients/index.ejs -->
+<%
+let body = `
+<!-- ========================================
+PAGE HEADER
+======================================== -->
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-users"></i> Daftar Pasien</h1>
+        <p class="subtitle">Kelola data pasien rumah sakit.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <form action="/patients" method="GET" class="d-flex gap-2">
+            <div class="position-relative">
+                <i class="fas fa-search position-absolute" style="left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                <input type="text" name="search" class="form-control ps-5" placeholder="Cari pasien..." value="${keyword || ''}" style="width: 250px;">
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+        ${user && user.role === 'admin' ? `
+            <a href="/patients/add" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tambah Pasien
+            </a>
+        ` : ''}
+        <a href="/dashboard/${user ? user.role : ''}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
+</div>
+
+<!-- ========================================
+TABLE
+======================================== -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama</th>
+                        <th>NIK</th>
+                        <th>Email</th>
+                        <th>Telepon</th>
+                        <th>Tanggal Lahir</th>
+                        ${user && user.role === 'admin' ? '<th style="text-align: center;">Aksi</th>' : ''}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${patients && patients.length > 0 ? patients.map((patient, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${patient.name}</strong></td>
+                            <td>${patient.nik || '-'}</td>
+                            <td>${patient.email || '-'}</td>
+                            <td>${patient.phone || '-'}</td>
+                            <td>${patient.birthDate || '-'}</td>
+                            ${user && user.role === 'admin' ? `
+                            <td style="text-align: center;">
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <a href="/patients/edit/${patient.id}" class="btn btn-warning btn-sm" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/patients/delete/${patient.id}" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pasien ini?')" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>` : ''}
+                        </tr>
+                    `).join('') : `
+                        <tr>
+                            <td colspan="${user && user.role === 'admin' ? 7 : 6}" class="text-center py-5">
+                                <div class="empty-state">
+                                    <i class="fas fa-users-slash"></i>
+                                    <h5>Belum ada data pasien</h5>
+                                    <p>Tambahkan pasien baru untuk memulai.</p>
+                                    ${user && user.role === 'admin' ? `
+                                        <a href="/patients/add" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Tambah Pasien
+                                        </a>
+                                    ` : ''}
+                                </div>
+                            </td>
+                        </tr>
+                    `}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+`;
+%>
+<%- include('../layout', { title: 'Daftar Pasien', body: body }) %>

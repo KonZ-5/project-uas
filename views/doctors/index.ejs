@@ -1,0 +1,86 @@
+<!-- views/doctors/index.ejs -->
+<%
+let body = `
+<!-- ========================================
+PAGE HEADER
+======================================== -->
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-user-md"></i> Daftar Dokter</h1>
+        <p class="subtitle">Kelola data dokter rumah sakit.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        ${user && user.role === 'admin' ? `
+            <a href="/doctors/add" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tambah Dokter
+            </a>
+        ` : ''}
+        <a href="/dashboard/${user ? user.role : ''}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
+</div>
+
+<!-- ========================================
+TABLE
+======================================== -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Spesialis</th>
+                        <th>Telepon</th>
+                        <th>Jadwal</th>
+                        ${user && user.role === 'admin' ? '<th style="text-align: center;">Aksi</th>' : ''}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${doctors && doctors.length > 0 ? doctors.map((doctor, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${doctor.name}</strong></td>
+                            <td>${doctor.email}</td>
+                            <td><span class="badge-custom badge-info-custom">${doctor.specialist || 'Umum'}</span></td>
+                            <td>${doctor.phone || '-'}</td>
+                            <td>${doctor.schedule || '-'}</td>
+                            ${user && user.role === 'admin' ? `
+                            <td style="text-align: center;">
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <a href="/doctors/edit/${doctor.id}" class="btn btn-warning btn-sm" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/doctors/delete/${doctor.id}" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus dokter ini?')" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>` : ''}
+                        </tr>
+                    `).join('') : `
+                        <tr>
+                            <td colspan="${user && user.role === 'admin' ? 7 : 6}" class="text-center py-5">
+                                <div class="empty-state">
+                                    <i class="fas fa-user-md-slash"></i>
+                                    <h5>Belum ada data dokter</h5>
+                                    <p>Tambahkan dokter baru untuk memulai.</p>
+                                    ${user && user.role === 'admin' ? `
+                                        <a href="/doctors/add" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Tambah Dokter
+                                        </a>
+                                    ` : ''}
+                                </div>
+                            </td>
+                        </tr>
+                    `}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+`;
+%>
+<%- include('../layout', { title: 'Daftar Dokter', body: body }) %>

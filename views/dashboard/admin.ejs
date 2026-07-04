@@ -1,0 +1,87 @@
+<!-- views/dashboard/admin.ejs -->
+<%
+let body = `
+<!-- ========================================
+PAGE HEADER
+======================================== -->
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-chart-pie"></i> Dashboard Admin</h1>
+        <p class="subtitle">Selamat datang, <strong>${user ? user.name : ''}</strong>! Kelola seluruh data rumah sakit di sini.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <span class="badge bg-primary bg-opacity-10 text-primary px-4 py-2 rounded-pill">
+            <i class="fas fa-calendar-day me-2"></i> ${new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+        </span>
+    </div>
+</div>
+
+<!-- ========================================
+STATISTICS CARDS
+======================================== -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="fas fa-user-md text-primary"></i></div>
+            <div class="stat-number">${totalDoctors || 0}</div>
+            <div class="stat-label">Total Dokter</div>
+            <a href="/doctors" class="stat-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="fas fa-users text-success"></i></div>
+            <div class="stat-number">${totalPatients || 0}</div>
+            <div class="stat-label">Total Pasien</div>
+            <a href="/patients" class="stat-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="stat-card yellow">
+            <div class="stat-icon"><i class="fas fa-calendar-check text-warning"></i></div>
+            <div class="stat-number">${totalAppointments || 0}</div>
+            <div class="stat-label">Total Janji Temu</div>
+            <a href="/appointments" class="stat-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="stat-card purple">
+            <div class="stat-icon"><i class="fas fa-prescription text-purple" style="color:#8b5cf6;"></i></div>
+            <div class="stat-number">${totalPrescriptions || 0}</div>
+            <div class="stat-label">Total Resep</div>
+            <a href="/prescriptions" class="stat-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================
+QUICK ACTIONS
+======================================== -->
+<div class="row g-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-bolt"></i> Aksi Cepat</span>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="/patients/add" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Tambah Pasien
+                    </a>
+                    <a href="/doctors/add" class="btn btn-success">
+                        <i class="fas fa-user-md"></i> Tambah Dokter
+                    </a>
+                    <a href="/appointments/add" class="btn btn-warning">
+                        <i class="fas fa-calendar-plus"></i> Buat Janji Temu
+                    </a>
+                    <a href="/prescriptions/add" class="btn btn-info text-white">
+                        <i class="fas fa-prescription"></i> Buat Resep
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+`;
+%>
+<%- include('../layout', { title: 'Dashboard Admin', body: body }) %>

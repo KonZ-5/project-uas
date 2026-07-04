@@ -1,0 +1,32 @@
+{
+  "name": "hospital-portal",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "chart.js": "^4.5.0",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.6.1",
+    "ejs": "^3.1.10",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "firebase": "^12.15.0",
+    "firebase-admin": "^13.10.0",
+    "jsonwebtoken": "^9.0.3",
+    "method-override": "^3.0.0",
+    "multer": "^2.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

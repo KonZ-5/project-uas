@@ -1,0 +1,101 @@
+<!-- views/appointments/form.ejs -->
+<%
+let body = `
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-md-9">
+        <div class="card">
+            <div class="card-header">
+                <span>
+                    <i class="fas fa-calendar-plus"></i> Buat Janji Temu
+                </span>
+            </div>
+            <div class="card-body">
+                <form action="/appointments/add" method="POST">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Dokter <span class="required">*</span></label>
+                            <select class="form-select" id="doctorName" name="doctorName" required>
+                                <option value="">Pilih Dokter</option>
+                                ${doctors.map(doctor => `
+                                    <option value="${doctor.name}" data-email="${doctor.email}">
+                                        ${doctor.name} ${doctor.specialist ? `- ${doctor.specialist}` : ''}
+                                    </option>
+                                `).join('')}
+                            </select>
+                            <input type="hidden" id="doctorEmail" name="doctorEmail">
+                        </div>
+                        
+                        <div class="col-md-6 form-group">
+                            <label>Pasien <span class="required">*</span></label>
+                            ${user && user.role === 'admin' ? `
+                                <select class="form-select" id="patientName" name="patientName" required>
+                                    <option value="">Pilih Pasien</option>
+                                    ${patients.map(patient => `
+                                        <option value="${patient.name}" data-email="${patient.email || ''}">
+                                            ${patient.name}
+                                        </option>
+                                    `).join('')}
+                                </select>
+                                <input type="hidden" id="patientEmail" name="patientEmail">
+                            ` : `
+                                <input type="text" class="form-control" value="${user.name}" readonly>
+                                <input type="hidden" name="patientName" value="${user.name}">
+                                <input type="hidden" name="patientEmail" value="${user.email}">
+                            `}
+                        </div>
+                        
+                        <div class="col-md-6 form-group">
+                            <label>Tanggal <span class="required">*</span></label>
+                            <input type="date" class="form-control" id="appointmentDate" name="appointmentDate" required>
+                        </div>
+                        
+                        <div class="col-md-6 form-group">
+                            <label>Jam <span class="required">*</span></label>
+                            <input type="time" class="form-control" id="appointmentTime" name="appointmentTime" required>
+                        </div>
+                        
+                        <div class="col-12 form-group">
+                            <label>Keluhan</label>
+                            <textarea class="form-control" name="complaint" rows="3" 
+                                      placeholder="Jelaskan keluhan Anda"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2 mt-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                        <a href="/appointments" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-fill doctor email
+        document.getElementById('doctorName').addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            document.getElementById('doctorEmail').value = selected.getAttribute('data-email') || '';
+        });
+        
+        ${user && user.role === 'admin' ? `
+        // Auto-fill patient email
+        document.getElementById('patientName').addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            document.getElementById('patientEmail').value = selected.getAttribute('data-email') || '';
+        });
+        ` : ''}
+        
+        // Set min date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('appointmentDate').min = today;
+    });
+</script>
+`;
+%>
+<%- include('../layout', { title: 'Buat Janji Temu', body: body }) %>

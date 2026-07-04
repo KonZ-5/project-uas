@@ -1,0 +1,79 @@
+<!-- views/records/index.ejs -->
+<%
+let body = `
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-notes-medical"></i> Rekam Medis</h1>
+        <p class="subtitle">Kelola rekam medis pasien.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        ${user && (user.role === 'admin' || user.role === 'doctor') ? `
+            <a href="/records/add" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tambah Rekam Medis
+            </a>
+        ` : ''}
+        <a href="/dashboard/${user ? user.role : ''}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Pasien</th>
+                        <th>Dokter</th>
+                        <th>Diagnosis</th>
+                        <th>Tanggal</th>
+                        <th style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${records && records.length > 0 ? records.map((record, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${record.patientName || '-'}</strong></td>
+                            <td>${record.doctorName || '-'}</td>
+                            <td>${record.diagnosis || '-'}</td>
+                            <td>${record.createdAt ? new Date(record.createdAt).toLocaleDateString('id-ID') : '-'}</td>
+                            <td style="text-align: center;">
+                                ${user && (user.role === 'admin' || (user.role === 'doctor' && record.doctorEmail === user.email)) ? `
+                                    <div class="d-flex gap-1 justify-content-center">
+                                        <a href="/records/edit/${record.id}" class="btn btn-warning btn-sm" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="/records/delete/${record.id}" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus?')" title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                ` : '<span class="text-muted">-</span>'}
+                            </td>
+                        </tr>
+                    `).join('') : `
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="empty-state">
+                                    <i class="fas fa-file-medical-slash"></i>
+                                    <h5>Belum ada rekam medis</h5>
+                                    <p>Mulai buat rekam medis untuk pasien.</p>
+                                    ${user && (user.role === 'admin' || user.role === 'doctor') ? `
+                                        <a href="/records/add" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Tambah Rekam Medis
+                                        </a>
+                                    ` : ''}
+                                </div>
+                            </td>
+                        </tr>
+                    `}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+`;
+%>
+<%- include('../layout', { title: 'Rekam Medis', body: body }) %>

@@ -1,0 +1,111 @@
+<!-- views/appointments/index.ejs -->
+<%
+let body = `
+<!-- ========================================
+PAGE HEADER
+======================================== -->
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-calendar-check"></i> Janji Temu</h1>
+        <p class="subtitle">Kelola semua janji temu pasien.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        ${user && (user.role === 'admin' || user.role === 'patient') ? `
+            <a href="/appointments/add" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Buat Janji Temu
+            </a>
+        ` : ''}
+        <a href="/dashboard/${user ? user.role : ''}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
+</div>
+
+<!-- ========================================
+TABLE
+======================================== -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Dokter</th>
+                        <th>Pasien</th>
+                        <th>Tanggal</th>
+                        <th>Jam</th>
+                        <th>Status</th>
+                        <th style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${appointments && appointments.length > 0 ? appointments.map((appointment, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>
+                                <strong>${appointment.doctorName}</strong>
+                                <br><small class="text-muted">${appointment.doctorEmail}</small>
+                            </td>
+                            <td>
+                                <strong>${appointment.patientName}</strong>
+                                <br><small class="text-muted">${appointment.patientEmail}</small>
+                            </td>
+                            <td>${appointment.appointmentDate}</td>
+                            <td>${appointment.appointmentTime}</td>
+                            <td>
+                                ${appointment.status === 'Pending' ? `<span class="badge-custom badge-pending"><i class="fas fa-clock me-1"></i>Pending</span>` : 
+                                  appointment.status === 'Approved' ? `<span class="badge-custom badge-approved"><i class="fas fa-check-circle me-1"></i>Disetujui</span>` : 
+                                  appointment.status === 'Cancelled' ? `<span class="badge-custom badge-cancelled"><i class="fas fa-times-circle me-1"></i>Dibatalkan</span>` : 
+                                  `<span class="badge-custom badge-secondary-custom">${appointment.status}</span>`}
+                            </td>
+                            <td style="text-align: center;">
+                                <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                    ${user && (user.role === 'admin' || (user.role === 'doctor' && appointment.doctorEmail === user.email)) ? `
+                                        ${appointment.status === 'Pending' ? `
+                                            <a href="/appointments/approve/${appointment.id}" class="btn btn-success btn-sm" onclick="return confirm('Setujui janji temu ini?')" title="Setujui">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            <a href="/appointments/cancel/${appointment.id}" class="btn btn-danger btn-sm" onclick="return confirm('Batalkan janji temu ini?')" title="Batalkan">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        ` : ''}
+                                        <a href="/appointments/edit/${appointment.id}" class="btn btn-warning btn-sm" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="/appointments/delete/${appointment.id}" class="btn btn-danger btn-sm" onclick="return confirm('Hapus janji temu ini?')" title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    ` : ''}
+                                    ${user && (user.role === 'admin' || (user.role === 'doctor' && appointment.doctorEmail === user.email)) ? `
+                                        <a href="/records/from-appointment/${appointment.id}" class="btn btn-info btn-sm text-white" title="Buat Rekam Medis">
+                                            <i class="fas fa-notes-medical"></i>
+                                        </a>
+                                    ` : ''}
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('') : `
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="empty-state">
+                                    <i class="fas fa-calendar-times"></i>
+                                    <h5>Belum ada janji temu</h5>
+                                    <p>Mulai buat janji temu pertama Anda.</p>
+                                    ${user && (user.role === 'admin' || user.role === 'patient') ? `
+                                        <a href="/appointments/add" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Buat Janji Temu
+                                        </a>
+                                    ` : ''}
+                                </div>
+                            </td>
+                        </tr>
+                    `}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+`;
+%>
+<%- include('../layout', { title: 'Janji Temu', body: body }) %>

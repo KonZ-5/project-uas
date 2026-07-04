@@ -1,0 +1,212 @@
+<!-- views/layout.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Management Rumah Sakit Medika' %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+        }
+        .navbar-custom {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .navbar-custom .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .navbar-custom .navbar-brand i { margin-right: 10px; }
+        .navbar-custom .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .navbar-custom .nav-link:hover {
+            color: white !important;
+            background: rgba(255,255,255,0.15);
+        }
+        .navbar-custom .nav-link.active {
+            color: white !important;
+            background: rgba(255,255,255,0.2);
+        }
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .container-custom {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 0.5rem;
+        }
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            transition: all 0.3s ease;
+        }
+        .dropdown-item:hover {
+            background: #f1f5f9;
+        }
+        .dropdown-item i { margin-right: 8px; width: 20px; text-align: center; }
+        .badge-custom {
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-approved { background: #d1fae5; color: #065f46; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-cancelled { background: #fee2e2; color: #991b1b; }
+        .badge-completed { background: #dbeafe; color: #1e40af; }
+        .flash-message {
+            animation: slideDown 0.5s ease;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard/<%= user ? user.role : '' %>">
+                <i class="fas fa-hospital"></i> Rumah Sakit Medika
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <% if (user) { %>
+                        <!-- Admin Menu -->
+                        <% if (user.role === 'admin') { %>
+                            <li class="nav-item"><a class="nav-link" href="/dashboard/admin"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/doctors"><i class="fas fa-user-md"></i> Dokter</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/patients"><i class="fas fa-users"></i> Pasien</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/appointments"><i class="fas fa-calendar-check"></i> Janji Temu</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/statistics"><i class="fas fa-chart-bar"></i> Statistik</a></li>
+                        <% } %>
+                        
+                        <!-- Doctor Menu -->
+                        <% if (user.role === 'doctor') { %>
+                            <li class="nav-item"><a class="nav-link" href="/dashboard/doctor"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/appointments"><i class="fas fa-calendar-check"></i> Janji Temu</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/records"><i class="fas fa-notes-medical"></i> Rekam Medis</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/prescriptions"><i class="fas fa-prescription"></i> Resep</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/labs"><i class="fas fa-flask"></i> Lab</a></li>
+                        <% } %>
+                        
+                        <!-- Patient Menu -->
+                        <% if (user.role === 'patient') { %>
+                            <li class="nav-item"><a class="nav-link" href="/dashboard/patient"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/appointments"><i class="fas fa-calendar-check"></i> Janji Temu</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/records"><i class="fas fa-notes-medical"></i> Rekam Medis</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/prescriptions"><i class="fas fa-prescription"></i> Resep</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/labs"><i class="fas fa-flask"></i> Lab</a></li>
+                        <% } %>
+                        
+                        <!-- User Dropdown -->
+                        <li class="nav-item dropdown ms-2">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <span class="user-avatar"><%= user.name.charAt(0).toUpperCase() %></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <span class="dropdown-item-text">
+                                        <strong><%= user.name %></strong>
+                                        <br>
+                                        <small class="text-muted"><%= user.role %></small>
+                                    </span>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="/auth/logout">
+                                        <i class="fas fa-sign-out-alt text-danger"></i> Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item"><a class="nav-link" href="/auth/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        <% if (success && success.length > 0) { %>
+            <div class="alert alert-success alert-dismissible fade show flash-message" role="alert">
+                <i class="fas fa-check-circle"></i> <%= success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        <% if (error && error.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show flash-message" role="alert">
+                <i class="fas fa-exclamation-circle"></i> <%= error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        <% if (info && info.length > 0) { %>
+            <div class="alert alert-info alert-dismissible fade show flash-message" role="alert">
+                <i class="fas fa-info-circle"></i> <%= info %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-custom">
+        <%- body %>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-4" style="color: #64748b; border-top: 1px solid #e2e8f0; margin-top: 2rem;">
+        <p>&copy; <%= new Date().getFullYear() %> Sistem Rumah Sakit. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

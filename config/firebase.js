@@ -1,28 +1,21 @@
 require('dotenv').config();
 const admin = require('firebase-admin');
+const path = require('path');
 
 let db = null;
 
 try {
-  let serviceAccount;
-
-  // Cek apakah ada variabel di .env
-  if (process.env.firebase_service_account) {
-    serviceAccount = JSON.parse(process.env.firebase_service_account);
-  } else {
-    // Jika tidak ada di .env, coba baca langsung dari file lokal (pastikan file ini ada di folder proyek Anda)
-    // PENTING: Pastikan 'serviceAccountKey.json' sudah masuk ke .gitignore Anda!
-    serviceAccount = require('../serviceAccountKey.json'); 
-  }
+  // Langsung arahkan ke file JSON lokal Anda
+  const serviceAccount = require(path.join(__dirname, '../serviceAccountKey.json'));
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
 
   db = admin.firestore();
-  console.log("✅ Firebase Admin berhasil terhubung ke Firestore.");
+  console.log("✅ Firebase Admin berhasil terhubung ke Firestore!");
 } catch (error) {
-  console.error("❌ Firebase gagal terinisialisasi:", error.message);
+  console.error("❌ Gagal menginisialisasi Firebase:", error.message);
 }
 
 module.exports = db;

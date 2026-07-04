@@ -1,5 +1,7 @@
 // app.js
+// 1. WAJIB DI BARIS PALING ATAS agar semua file config bisa membaca variabel .env
 require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -7,16 +9,22 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const jwt = require('jsonwebtoken');
+
+// Memuat konfigurasi database Firebase Firestore yang sudah aman
 const db = require('./config/firebase');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ==========================================
 // VIEW ENGINE SETUP
+// ==========================================
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// MIDDLEWARE
+// ==========================================
+// MIDDLEWARE UTAMA
+// ==========================================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -24,21 +32,29 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// SESSION & FLASH
+// ==========================================
+// SESSION & FLASH (Menggunakan Secret dari .env)
+// ==========================================
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'secret-key',
+    secret: process.env.SESSION_SECRET || 'super-secret-key-default',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 }
+    cookie: { 
+        maxAge: 24 * 60 * 60 * 1000,
+        secure: process.env.NODE_ENV === 'production' // otomatis secure jika sudah online/SSL
+    }
 }));
 app.use(flash());
 
-// MIDDLEWARE AUTH - Untuk semua route
+// ==========================================
+// MIDDLEWARE AUTHENTICATION (Verifikasi JWT Token)
+// ==========================================
 app.use((req, res, next) => {
     const token = req.cookies.token;
     if (token) {
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            // Membaca JWT_SECRET rahasia dari file .env
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-jwt-key');
             req.user = decoded;
         } catch (err) {
             console.log('JWT Error:', err.message);
@@ -48,7 +64,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// GLOBAL VARIABLES UNTUK VIEW
+// ==========================================
+// GLOBAL VARIABLES UNTUK VIEW ENGINE (EJS)
+// ==========================================
 app.use((req, res, next) => {
     res.locals.user = req.user || null;
     res.locals.success = req.flash('success');
@@ -62,7 +80,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// IMPORT ROUTES
+// ==========================================
+// ROUTE MANAGEMENT (IMPORT & GUNAKAN)
+// ==========================================
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
@@ -75,7 +95,6 @@ const statisticsRoutes = require('./routes/statisticsRoutes');
 const userRoutes = require('./routes/userRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 
-// GUNAKAN ROUTES
 app.use('/auth', authRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/appointments', appointmentRoutes);
@@ -96,31 +115,43 @@ app.get('/', (req, res) => {
     res.redirect('/auth/login');
 });
 
-// ERROR HANDLER 404
+// ==========================================
+// PENANGANAN ERROR (404 & 500)
+// ==========================================
+
+// ERROR HANDLER 404 (Halaman Tidak Ditemukan)
 app.use((req, res) => {
     res.status(404).render('error', {
         message: 'Halaman tidak ditemukan',
-        error: { status: 404 },
+        error: { status: 404, stack: null },
         user: req.user || null,
         title: '404 - Halaman Tidak Ditemukan'
     });
 });
 
-// ERROR HANDLER 500
+// ERROR HANDLER 500 (Kesalahan Internal Server)
 app.use((err, req, res, next) => {
     console.error('Error:', err.stack);
+    
+    // Proteksi: Jangan tampilkan error stack asli ke user jika sudah mode production
+    const isDev = (process.env.NODE_ENV || 'development') === 'development';
+    
     res.status(500).render('error', {
         message: err.message || 'Terjadi kesalahan pada server',
-        error: process.env.NODE_ENV === 'development' ? err : { status: 500 },
+        error: isDev ? err : { status: 500, stack: null },
         user: req.user || null,
         title: '500 - Kesalahan Server'
     });
 });
 
-// START SERVER
+// ==========================================
+// JALANKAN SERVER
+// ==========================================
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`==================================================`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`==================================================`);
 });
 
 module.exports = app;

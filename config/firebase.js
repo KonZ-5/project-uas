@@ -10,14 +10,14 @@ if (!firebaseConfig) {
   try {
     const serviceAccount = JSON.parse(firebaseConfig);
 
-    // Ambil string private key dan paksa konversi \\n menjadi \n yang asli
+    // BARIS INI SANGAT PENTING: Mengubah teks \\n menjadi baris baru yang nyata
     const formattedPrivateKey = serviceAccount.private_key.replace(/\\n/g, '\n');
 
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: serviceAccount.project_id,
         clientEmail: serviceAccount.client_email,
-        privateKey: formattedPrivateKey // Menggunakan key yang sudah diperbaiki
+        privateKey: formattedPrivateKey // Menggunakan kunci yang sudah diperbaiki
       })
     });
 

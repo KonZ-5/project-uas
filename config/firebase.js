@@ -2,19 +2,23 @@ require('dotenv').config();
 const admin = require('firebase-admin');
 
 let db = null;
-
-// Ambil nilai dari environment variable
 const firebaseConfig = process.env.firebase_service_account;
 
 if (!firebaseConfig) {
-  console.error("⚠️ Peringatan: Variabel 'firebase_service_account' belum diatur di Environment Variables!");
+  console.error("⚠️ Peringatan: Variabel 'firebase_service_account' belum diatur!");
 } else {
   try {
-    // Hanya lakukan parse jika variabelnya ada (tidak undefined)
     const serviceAccount = JSON.parse(firebaseConfig);
 
+    // Ambil string private key dan paksa konversi \\n menjadi \n yang asli
+    const formattedPrivateKey = serviceAccount.private_key.replace(/\\n/g, '\n');
+
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
+      credential: admin.credential.cert({
+        projectId: serviceAccount.project_id,
+        clientEmail: serviceAccount.client_email,
+        privateKey: formattedPrivateKey // Menggunakan key yang sudah diperbaiki
+      })
     });
 
     db = admin.firestore();
